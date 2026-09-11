@@ -375,3 +375,23 @@ test_that("derivative surface has type = 'prediction'", {
 
   expect_equal(derivs[["gradient"]]$type, "prediction")
 })
+
+# --- added 2026-09-11 (ES-02) ------------------------------------------------
+# A derivative surface that is effectively constant used to have its computed
+# values overwritten with a fabricated linear ramp (+/- 0.1% of the value) so
+# plotly would not cull a zero-thickness mesh. The ramp was written into
+# `estimate`, so surf_optimum() reported an "optimum" at a corner of it, and it
+# widened the range past the constancy notice's threshold so nobody was told.
+# build_scene() already sets an explicit zaxis range for a flat surface, so the
+# render problem is handled where it belongs and the data stays honest.
+test_that("a constant second derivative is reported constant, not ramped", {
+  set.seed(1)
+  d <- data.frame(a = runif(120, 0, 10), b = runif(120, 0, 10))
+  # Purely additive: the cross-partial is exactly zero everywhere.
+  d$y <- 2 * d$a + 3 * d$b + rnorm(120, sd = 0.01)
+  fit <- lm(y ~ a + b, data = d)
+  es <- surf_prediction(fit, x = "a", y = "b", x_length = 8L, y_length = 8L)
+  dv <- surf_derivatives(es, type = "d2zdxdy")
+  est <- surf_data(dv$d2zdxdy)$estimate
+  expect_equal(diff(range(est)), 0)
+})

@@ -161,3 +161,18 @@ test_that("surf_prediction() errors on model without predict method", {
     "predict"
   )
 })
+
+# --- added 2026-09-11 (ES-01) ------------------------------------------------
+# `method = "manual"` is documented but was not one of ems_predict()'s choices,
+# so it always errored unless a `predict_fun` was also supplied -- which every
+# existing test did, hiding the path.
+test_that("method = 'manual' works without a predict_fun", {
+  set.seed(1)
+  d <- data.frame(a = runif(60, 0, 10), b = runif(60, 0, 10))
+  d$y <- 2 * d$a + 3 * d$b + rnorm(60, sd = 0.1)
+  fit <- lm(y ~ a + b, data = d)
+  es <- surf_prediction(fit, x = "a", y = "b", method = "manual",
+                        x_length = 5L, y_length = 5L)
+  expect_true(is_effectsurf(es))
+  expect_equal(nrow(surf_data(es)), 25L)
+})

@@ -1,5 +1,26 @@
 # effectsurf (development version)
 
+## Two correctness fixes
+
+* **`surf_derivatives()` no longer writes fabricated values into `estimate`.**
+  When a derivative surface was effectively constant, the computed values were
+  overwritten with a synthetic linear ramp (0.1% of the value) so plotly's
+  WebGL renderer would not cull a zero-thickness mesh. The ramp reached
+  `surf_data()`, `surf_tidy()`, `as.data.frame()`, `surf_export()` and
+  `surf_optimum()` as if it were a derivative, and `surf_optimum()` duly
+  reported an optimum at a corner of it. It also widened the range past the
+  threshold of the constancy notice, so the user was never told. The rendering
+  problem is already handled where it belongs -- `build_scene()` sets an
+  explicit `zaxis$range` for a flat surface -- so the residual noise is now
+  collapsed to the constant it represents and the data stays honest.
+
+* **`surf_prediction(method = "manual")` works without a `predict_fun`.** It is
+  a documented method but was not one of `ems_predict()`'s choices, so it
+  always errored. Every `method = "manual"` call in the suite happened to pass
+  a `predict_fun`, which routes to `"predict"` and hid the path; it is now
+  mapped to the backend it has always meant, and a test calls it with no
+  `predict_fun`.
+
 ## Manifest ingress
 
 * **`surf_from_manifest()` places effectsurf downstream of the orchestra

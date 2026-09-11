@@ -160,27 +160,29 @@ surf_derivatives <- function(object,
           # (e.g., d2z/dx2 ~= 1e-13 when it should be 0 for a plane)
           deriv_mat[abs(deriv_mat) < noise_floor] <- 0
 
-          # Stage 2: Stabilise effectively-constant matrices.
-          # When the VARIATION is below the noise floor but the VALUES are not
-          # (e.g., d2z/dxdy = 7.19e-06 +/- 1e-17), the matrix is constant --
-          # the tiny variation is machine-epsilon noise from repeated FD ops.
-          # Plotly's WebGL renderer culls zero-thickness mesh triangles, so a
-          # truly flat surface renders blank. Fix: replace noise with a tiny
-          # controlled gradient (+/- 0.1% of the value) so the mesh is renderable
-          # while appearing visually flat.
+          # Stage 2: flatten machine-epsilon noise to an exactly constant
+          # matrix. When the VARIATION is below the noise floor but the VALUES
+          # are not (e.g. d2z/dxdy = 7.19e-06 +/- 1e-17), the matrix is
+          # constant and the residual spread is noise from repeated
+          # finite-difference operations.
+          #
+          # This used to overwrite `deriv_mat` with a fabricated linear ramp
+          # (+/- 0.1% of the value) so plotly's WebGL renderer would not cull a
+          # zero-thickness mesh. The motive was real but the remedy was not
+          # confined to the picture: the ramp was written into `estimate`, so
+          # surf_data(), surf_tidy(), as.data.frame(), surf_export() and above
+          # all surf_optimum() consumed fabricated numbers as derivatives, and
+          # surf_optimum() duly reported an "optimum" at a corner of the
+          # synthetic ramp. It also widened the range past the threshold of the
+          # constancy notice below, so the user was never told.
+          #
+          # The rendering problem is already solved where it belongs:
+          # build_scene() sets an explicit `zaxis$range` when the z range is
+          # negligible (R/render-surface.R). So the data is left honest and
+          # the residual noise is collapsed to the constant it represents.
           d_range <- diff(range(deriv_mat, na.rm = TRUE))
           if (d_range > 0 && d_range < noise_floor) {
-            center_val <- mean(deriv_mat, na.rm = TRUE)
-            # Tiny spread: 0.1% of |value| or 1e-8 if value is near zero
-            spread <- max(abs(center_val) * 1e-3, 1e-8)
-            nr_d <- nrow(deriv_mat); nc_d <- ncol(deriv_mat)
-            # Linear ramp across the grid to give plotly renderable variation
-            ramp <- outer(
-              seq(-1, 1, length.out = nr_d),
-              seq(-1, 1, length.out = nc_d),
-              "+"
-            ) / 2  # range [-1, 1]
-            deriv_mat[] <- center_val + spread * ramp
+            deriv_mat[] <- mean(deriv_mat, na.rm = TRUE)
           }
         }
       }

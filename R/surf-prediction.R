@@ -125,7 +125,21 @@ surf_prediction <- function(model,
   )
 
   # Step 2: Generate predictions
-  pred_method <- if (!is.null(predict_fun)) "predict" else method
+  #
+  # `"manual"` is a documented method (see @param method above) but it is not
+  # one of ems_predict()'s choices -- that set is
+  # c("marginaleffects", "emmeans", "gratia", "predict") -- so asking for it
+  # without also supplying `predict_fun` reached match.arg() and always
+  # errored. Every `method = "manual"` call in the test suite happened to pass
+  # a `predict_fun` too, which routes to "predict" and hides the path. Map it
+  # to the backend it has always meant: stats::predict() on the model.
+  pred_method <- if (!is.null(predict_fun)) {
+    "predict"
+  } else if (identical(method, "manual")) {
+    "predict"
+  } else {
+    method
+  }
   preds <- ems_predict(
     model = model,
     grid = grid,
