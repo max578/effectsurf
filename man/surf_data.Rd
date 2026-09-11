@@ -10,7 +10,7 @@ surf_data(object, as_matrix = FALSE)
 \item{object}{An \code{effectsurf} object.}
 
 \item{as_matrix}{Logical. If \code{TRUE}, returns a list of matrices suitable
-for direct use with \code{\link[plotly:add_trace]{plotly::add_surface()}}. Default \code{FALSE}.}
+for direct use with \code{\link[plotly:add_surface]{plotly::add_surface()}}. Default \code{FALSE}.}
 }
 \value{
 A \code{data.table} (default) or a named list of matrices.
