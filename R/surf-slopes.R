@@ -71,6 +71,14 @@ surf_slopes <- function(model,
 
   # Step 2: Compute slopes
   if (method == "emmeans") {
+    # The second locus of the ES-04 defect class. `ems_slopes_emmeans()` takes
+    # no `slope`, and `emmeans::emtrends()` computes dy/dx only, so a request
+    # for "eyex" used to return dy/dx silently while `meta$slope` recorded
+    # "eyex" -- the object's own provenance asserting an elasticity it never
+    # computed. Refuse for the same reason surf_comparison() refuses: this
+    # backend cannot honour the estimand, and translating it here would move
+    # the defect one level down rather than remove it.
+    check_emmeans_slope(slope)
     result <- ems_slopes_emmeans(model, grid, x, y, by, variable, level, ...)
   } else {
     slopes_result <- marginaleffects::slopes(
@@ -170,4 +178,26 @@ ems_slopes_emmeans <- function(model, grid, x, y, by, variable, level, ...) {
   keep <- intersect(c(grid_cols, "estimate", "std.error", "conf.low", "conf.high"),
                     names(em_dt))
   em_dt[, ..keep]
+}
+
+
+# The slope-side companion to check_emmeans_estimand(). `emmeans::emtrends()`
+# returns the derivative dy/dx; the elasticity forms marginaleffects offers
+# ("eyex", "eydx", "dyex") are rescalings it does not compute, so asking for
+# one on this backend is a request it cannot honour.
+#
+# @noRd
+check_emmeans_slope <- function(slope) {
+  if (!identical(slope, "dydx")) {
+    effectsurf_refusal(
+      reason = "slope_unsupported_by_backend",
+      message = paste0(
+        "`method = \"emmeans\"` computes the derivative dy/dx only, so ",
+        "`slope = \"", slope, "\"` cannot be honoured by this backend. Use ",
+        "`method = \"marginaleffects\"` for it, or `slope = \"dydx\"` to ",
+        "stay on emmeans."
+      )
+    )
+  }
+  invisible(NULL)
 }

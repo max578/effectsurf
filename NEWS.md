@@ -1,5 +1,19 @@
 # effectsurf (development version)
 
+* **The same estimand-discard defect is closed at its second locus.**
+  `surf_slopes(method = "emmeans")` dropped `slope` exactly as
+  `surf_comparison()` dropped `comparison`: `emmeans::emtrends()` computes the
+  derivative dy/dx only, so a request for `"eyex"`, `"eydx"` or `"dyex"` silently
+  returned dy/dx while `meta$slope` recorded the elasticity the object never
+  computed. It now refuses with a typed `effectsurf_refusal`, naming the backend
+  that does honour the request. Fixing `surf_comparison()` alone would have left
+  this alive, which is why the class was not declared closed at the time.
+
+* `S7` is declared in `Suggests`. `surf_from_manifest()` uses `S7::` behind a
+  `requireNamespace()` guard, but the dependency was never declared, so
+  `R CMD check --as-cran` reported an undeclared import -- a warning introduced
+  by the manifest-ingress commit and not caught there.
+
 ## Three correctness fixes
 
 * **`surf_derivatives()` no longer writes fabricated values into `estimate`.**
