@@ -1,6 +1,6 @@
 # effectsurf (development version)
 
-## Two correctness fixes
+## Three correctness fixes
 
 * **`surf_derivatives()` no longer writes fabricated values into `estimate`.**
   When a derivative surface was effectively constant, the computed values were
@@ -13,6 +13,23 @@
   problem is already handled where it belongs -- `build_scene()` sets an
   explicit `zaxis$range` for a flat surface -- so the residual noise is now
   collapsed to the constant it represents and the data stays honest.
+
+* **`surf_comparison(method = "emmeans")` no longer reports an estimand it
+  did not compute.** The emmeans backend was called without the `comparison`
+  argument and always took the pairwise difference of estimated marginal
+  means. A user who asked for `comparison = "ratio"` or `"lnratio"` received
+  differences, and `es_meta()` reported the ratio they had asked for, so
+  nothing in the object or in a plot drawn from it revealed the substitution;
+  a `contrast` given as a level name or a step size was dropped the same way.
+  Since a ratio is not a difference, and emmeans reaches one only by
+  re-expressing the contrast on a transformed scale -- which would give a
+  ratio on a log link and another difference on an identity link -- the
+  backend now refuses these combinations with a typed `effectsurf_refusal()`
+  that names `method = "marginaleffects"` as the route that honours them.
+  Both fields of `meta` now record what was computed: `"difference"`, and
+  `"pairwise"` where that default was applied. The marginaleffects backend is
+  unchanged, and the first tests of the treatment-effect verbs grade every
+  documented `comparison` against an analytic oracle.
 
 * **`surf_prediction(method = "manual")` works without a `predict_fun`.** It is
   a documented method but was not one of `ems_predict()`'s choices, so it

@@ -11,12 +11,19 @@
 #'
 #' @inheritParams surf_prediction
 #' @param variable Character. The treatment/contrast variable.
-#' @param contrast Character or numeric. Specifies the contrast:
+#' @param contrast Character, numeric, or list. Specifies the contrast:
 #'   - For factors: `"pairwise"`, `"reference"`, or a specific level
 #'     (e.g., `"high N"` to compare against reference).
 #'   - For numeric: a unit change value (default 1).
+#'
+#'   Under `method = "emmeans"` the only accepted form is a list of contrast
+#'   coefficients for [emmeans::contrast()]; every other form is a
+#'   marginaleffects specification and is refused.
 #' @param comparison Character. Type of comparison: `"difference"` (default),
 #'   `"ratio"`, `"lnratio"`. Passed to [marginaleffects::comparisons()].
+#'   `method = "emmeans"` computes differences of estimated marginal means and
+#'   nothing else, so it refuses any other value rather than returning a
+#'   difference under the requested name.
 #'
 #' @return An [effectsurf][new_effectsurf] object of type `"comparison"`.
 #'
@@ -65,6 +72,12 @@ surf_comparison <- function(model,
   validate_model(model)
   smooth_opts <- resolve_smooth_opts(smooth)
 
+  # The emmeans backend computes one estimand. Refuse anything else before any
+  # work is done, rather than return a difference under another name.
+  if (method == "emmeans") {
+    check_emmeans_estimand(comparison, contrast)
+  }
+
   # Step 1: Create prediction grid (without the contrast variable)
   grid <- ems_grid(
     model = model,
@@ -84,6 +97,11 @@ surf_comparison <- function(model,
                                       contrast, level, ...)
     result <- em_out$result
     strata_var_out <- em_out$strata_var
+
+    # What the backend computed, which is not always what was asked for: a
+    # `NULL` contrast means the pairwise default was applied.
+    comparison_out <- "difference"
+    contrast_out <- if (is.null(contrast)) "pairwise" else contrast
   } else {
     comp_args <- list(
       model     = model,
@@ -123,6 +141,9 @@ surf_comparison <- function(model,
 
     keep_cols <- unique(c(grid_cols, pred_cols))
     result <- comps_dt[, ..keep_cols]
+
+    comparison_out <- comparison
+    contrast_out <- contrast
   }
 
   # Step 2b: Apply post-prediction smoothing if requested
@@ -147,14 +168,68 @@ surf_comparison <- function(model,
     transform  = transform,
     meta       = list(
       variable   = variable,
-      contrast   = contrast,
-      comparison = comparison,
+      contrast   = contrast_out,
+      comparison = comparison_out,
       grid_type  = grid_type,
       level      = level,
       method     = method,
       smooth     = smooth_opts
     )
   )
+}
+
+
+# The emmeans backend computes one estimand and one only: the pairwise
+# difference of estimated marginal means, or the linear combination supplied as
+# a list of contrast coefficients. It has no ratio or log-ratio path, and
+# building one would mean re-expressing the contrast on a transformed scale --
+# that is constructing an estimand, not rendering one, and effectsurf does not
+# construct estimands. It would also be wrong on models it cannot detect:
+# `emmeans::contrast(type = "response")` returns a ratio on a log link but a
+# plain difference on an identity link, so a translation layer would reproduce
+# this very defect one level down. So refuse, and name the backend that does
+# honour the request.
+#
+# @noRd
+check_emmeans_estimand <- function(comparison, contrast) {
+  if (!identical(comparison, "difference")) {
+    effectsurf_refusal(
+      reason = "estimand_unsupported_by_backend",
+      message = paste0(
+        "`method = \"emmeans\"` computes differences of estimated marginal ",
+        "means only, so ", describe_estimand(comparison), " cannot be ",
+        "honoured by this backend. Use `method = \"marginaleffects\"` for it, ",
+        "or `comparison = \"difference\"` to stay on emmeans."
+      )
+    )
+  }
+
+  if (!is.null(contrast) && !is.list(contrast)) {
+    effectsurf_refusal(
+      reason = "contrast_unsupported_by_backend",
+      message = paste0(
+        "`method = \"emmeans\"` accepts `contrast` only as a list of contrast ",
+        "coefficients for `emmeans::contrast()`; a character or numeric ",
+        "`contrast` is a marginaleffects specification and this backend would ",
+        "ignore it. Use `method = \"marginaleffects\"`, or supply `contrast` ",
+        "as a named list of coefficients."
+      )
+    )
+  }
+
+  invisible(NULL)
+}
+
+
+# Name the requested estimand in an error message without assuming it is a
+# single string: marginaleffects also accepts a function.
+#
+# @noRd
+describe_estimand <- function(comparison) {
+  if (is.character(comparison) && length(comparison) == 1L) {
+    return(paste0("`comparison = \"", comparison, "\"`"))
+  }
+  "the requested `comparison`"
 }
 
 

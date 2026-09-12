@@ -39,15 +39,22 @@ surf_comparison(
 
 \item{variable}{Character. The treatment/contrast variable.}
 
-\item{contrast}{Character or numeric. Specifies the contrast:
+\item{contrast}{Character, numeric, or list. Specifies the contrast:
 \itemize{
 \item For factors: \code{"pairwise"}, \code{"reference"}, or a specific level
 (e.g., \code{"high N"} to compare against reference).
 \item For numeric: a unit change value (default 1).
-}}
+}
+
+Under \code{method = "emmeans"} the only accepted form is a list of contrast
+coefficients for \code{\link[emmeans:contrast]{emmeans::contrast()}}; every other form is a
+marginaleffects specification and is refused.}
 
 \item{comparison}{Character. Type of comparison: \code{"difference"} (default),
-\code{"ratio"}, \code{"lnratio"}. Passed to \code{\link[marginaleffects:comparisons]{marginaleffects::comparisons()}}.}
+\code{"ratio"}, \code{"lnratio"}. Passed to \code{\link[marginaleffects:comparisons]{marginaleffects::comparisons()}}.
+\code{method = "emmeans"} computes differences of estimated marginal means and
+nothing else, so it refuses any other value rather than returning a
+difference under the requested name.}
 
 \item{by}{Character or \code{NULL}. Name of a categorical variable for
 stratification. Each level produces a separate surface.}

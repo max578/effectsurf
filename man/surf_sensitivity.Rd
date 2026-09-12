@@ -45,7 +45,8 @@ examined.}
 size (default 1).}
 
 \item{comparison}{Character. \code{"difference"} (default), \code{"ratio"}, or
-\code{"lnratio"}.}
+\code{"lnratio"}. \code{method = "emmeans"} computes differences only and refuses
+any other value.}
 
 \item{by}{Character or \code{NULL}. Name of a categorical variable for
 stratification. Each level produces a separate surface.}

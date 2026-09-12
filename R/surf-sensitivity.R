@@ -15,7 +15,8 @@
 #'   (e.g., `"high N - nil N"`). For continuous `focal`: a numeric step
 #'   size (default 1).
 #' @param comparison Character. `"difference"` (default), `"ratio"`, or
-#'   `"lnratio"`.
+#'   `"lnratio"`. `method = "emmeans"` computes differences only and refuses
+#'   any other value.
 #'
 #' @return An [effectsurf][new_effectsurf] object of type `"comparison"`.
 #'
