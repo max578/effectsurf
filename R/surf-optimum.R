@@ -7,7 +7,9 @@
 #' the predicted response on the surface grid.
 #'
 #' @param object An [effectsurf][new_effectsurf] object.
-#' @param type Character. `"max"` (default) or `"min"`.
+#' @param type Character or `NULL`. `"max"` or `"min"`. When `NULL`, a
+#'   surface built by [surf_grid()] with `direction = "minimise"` gives
+#'   `"min"` and every other surface gives `"max"`.
 #'
 #' @return A `data.table` with columns: `stratum` (if stratified), the
 #'   x variable, the y variable, `estimate`, and optionally `conf.low`,
@@ -24,12 +26,15 @@
 #'   surf_optimum(es, type = "max")
 #' }
 #' }
-surf_optimum <- function(object, type = c("max", "min")) {
+surf_optimum <- function(object, type = NULL) {
   if (!inherits(object, "effectsurf")) {
     cli_abort("{.arg object} must be an {.cls effectsurf} object.")
   }
 
-  type <- match.arg(type)
+  if (is.null(type)) {
+    type <- if (identical(object$meta$direction, "minimise")) "min" else "max"
+  }
+  type <- match.arg(type, c("max", "min"))
   dt <- copy(object$data)
 
   # Apply transform if present

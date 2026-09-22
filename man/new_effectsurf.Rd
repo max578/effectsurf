@@ -10,7 +10,7 @@ new_effectsurf(
   y_var,
   z_var,
   strata_var = NULL,
-  type = c("prediction", "comparison", "slopes", "cate"),
+  type = c("prediction", "comparison", "slopes", "cate", "score"),
   ci = FALSE,
   model_info = list(),
   labels = list(),
@@ -33,7 +33,8 @@ the x variable, y variable, \code{estimate}, and optionally \code{std.error},
 stratification variable.}
 
 \item{type}{Character. One of \code{"prediction"}, \code{"comparison"}, \code{"slopes"},
-\code{"cate"}.}
+\code{"cate"}, \code{"score"}. A \code{"score"} surface holds a cross-validated loss or
+another value computed outside a model; see \code{\link[=surf_grid]{surf_grid()}}.}
 
 \item{ci}{Logical. Whether confidence intervals are included.}
 

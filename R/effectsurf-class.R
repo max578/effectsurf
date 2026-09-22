@@ -16,7 +16,8 @@
 #' @param strata_var Character or `NULL`. Name of the categorical
 #'   stratification variable.
 #' @param type Character. One of `"prediction"`, `"comparison"`, `"slopes"`,
-#'   `"cate"`.
+#'   `"cate"`, `"score"`. A `"score"` surface holds a cross-validated loss or
+#'   another value computed outside a model; see [surf_grid()].
 #' @param ci Logical. Whether confidence intervals are included.
 #' @param model_info A named list with model metadata: `class`, `formula`,
 #'   `n_obs`, `call`.
@@ -43,7 +44,8 @@ new_effectsurf <- function(data,
                            y_var,
                            z_var,
                            strata_var = NULL,
-                           type = c("prediction", "comparison", "slopes", "cate"),
+                           type = c("prediction", "comparison", "slopes", "cate",
+                                    "score"),
                            ci = FALSE,
                            model_info = list(),
                            labels = list(),
@@ -116,8 +118,11 @@ print.effectsurf <- function(x, ...) {
     prediction = "Prediction Surface",
     comparison = "Effect Comparison Surface",
     slopes     = "Marginal Effect Surface",
-    cate       = "CATE Surface"
+    cate       = "CATE Surface",
+    score      = "Cross-Validated Score Surface"
   )
+  direction <- x$meta$direction
+  better <- if (identical(direction, "minimise")) "smaller" else "larger"
 
   n_points <- nrow(x$data)
   n_strata <- if (!is.null(x$strata_var)) {
@@ -134,6 +139,9 @@ print.effectsurf <- function(x, ...) {
       "Stratified by: {.field {x$strata_var}} ({.val {n_strata}} levels)"
     },
     "*" = "CI: {.val {x$ci}} | Transform: {.val {!is.null(x$transform)}}",
+    "*" = if (!is.null(direction)) {
+      "Score computed outside a model; {better} is better"
+    },
     "i" = "Use {.fn plot} to visualise, {.fn surf_data} to extract data."
   ))
 

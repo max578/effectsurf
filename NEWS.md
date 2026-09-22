@@ -1,5 +1,11 @@
 # effectsurf (development version)
 
+* `surf_grid()` builds a surface from a precomputed grid: a cross-validated
+  loss over two tuning axes, computed outside a model. It refuses a ragged grid
+  naming the missing cells, records a `direction` that `surf_optimum()` reads
+  when `type` is not given, and carries the new `"score"` type, which print
+  output and captions report as a cross-validated score.
+
 * The profile PDFs written beside an exported surface no longer exchange x and
   y: `save_profile_pdfs()` read the x profile from the matrix rows (one per y)
   and the y profile from the columns, which errored on a non-square grid and

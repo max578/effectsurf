@@ -12,6 +12,7 @@ reference:
       - surf_sensitivity
       - surf_cate
       - surf_derivatives
+      - surf_grid
   - title: "Visualisation & Export"
     desc: "Plot, project, and export surfaces."
     contents:

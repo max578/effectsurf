@@ -4,12 +4,14 @@
 \alias{surf_optimum}
 \title{Find the optimum (maximum or minimum) of a surface}
 \usage{
-surf_optimum(object, type = c("max", "min"))
+surf_optimum(object, type = NULL)
 }
 \arguments{
 \item{object}{An \link[=new_effectsurf]{effectsurf} object.}
 
-\item{type}{Character. \code{"max"} (default) or \code{"min"}.}
+\item{type}{Character or \code{NULL}. \code{"max"} or \code{"min"}. When \code{NULL}, a
+surface built by \code{\link[=surf_grid]{surf_grid()}} with \code{direction = "minimise"} gives
+\code{"min"} and every other surface gives \code{"max"}.}
 }
 \value{
 A \code{data.table} with columns: \code{stratum} (if stratified), the

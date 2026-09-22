@@ -89,7 +89,8 @@ build_labels <- function(labels, x_var, y_var, z_var, strata_var, type) {
     prediction = "Prediction surface",
     comparison = "Effect comparison",
     slopes     = "Marginal effect surface",
-    cate       = "CATE surface"
+    cate       = "CATE surface",
+    score      = "Cross-validated score surface"
   )
 
   if (is.null(strata_var)) {
