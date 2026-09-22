@@ -1,5 +1,10 @@
 # effectsurf (development version)
 
+* The profile PDFs written beside an exported surface no longer exchange x and
+  y: `save_profile_pdfs()` read the x profile from the matrix rows (one per y)
+  and the y profile from the columns, which errored on a non-square grid and
+  silently swapped the axes on a square one.
+
 * **The same estimand-discard defect is closed at its second locus.**
   `surf_slopes(method = "emmeans")` dropped `slope` exactly as
   `surf_comparison()` dropped `comparison`: `emmeans::emtrends()` computes the

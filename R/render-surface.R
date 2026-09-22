@@ -188,16 +188,9 @@ save_profile_pdfs <- function(object, surf_matrices, html_path) {
 
   colours <- default_strata_colours(max(n_strata, 1L))
 
-  # Compute max profiles from the z matrices
-  # x_profile: for each x value, max z across y (one curve per stratum)
-  # y_profile: for each y value, max z across x (one curve per stratum)
-  x_profile_list <- list()
-  y_profile_list <- list()
-  for (k in seq_len(n_strata)) {
-    z_mat <- surf_matrices[[k]]$z
-    x_profile_list[[strata_names[k]]] <- apply(z_mat, 1L, max)
-    y_profile_list[[strata_names[k]]] <- apply(z_mat, 2L, max)
-  }
+  profiles <- max_profiles(surf_matrices)
+  x_profile_list <- profiles$x
+  y_profile_list <- profiles$y
 
   base_path <- tools::file_path_sans_ext(html_path)
 
@@ -250,6 +243,23 @@ save_profile_pdfs <- function(object, surf_matrices, html_path) {
                   width = 12, height = 8, units = "in")
 
   invisible(NULL)
+}
+
+
+#' Maximum profiles of the z matrices along each axis
+#'
+#' A surface matrix has one row per y value and one column per x value. The
+#' x profile takes the maximum down each column (one value per x); the y
+#' profile takes the maximum along each row (one value per y).
+#'
+#' @param surf_matrices Output of `to_surface_matrices()`.
+#' @return A list with `x` and `y`, each a named list of one numeric vector
+#'   per stratum.
+#' @noRd
+max_profiles <- function(surf_matrices) {
+  x_profile_list <- lapply(surf_matrices, function(m) apply(m$z, 2L, max))
+  y_profile_list <- lapply(surf_matrices, function(m) apply(m$z, 1L, max))
+  list(x = x_profile_list, y = y_profile_list)
 }
 
 
