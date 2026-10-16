@@ -1,10 +1,6 @@
 
-# --- added 2026-09-12: the second locus of the ES-04 defect class -------------
-# ems_slopes_emmeans() takes no `slope`, and emtrends() computes dy/dx only, so
-# `slope = "eyex"` on the emmeans backend used to return dy/dx while meta$slope
-# recorded "eyex". The audit named this class at surf_comparison(); it was alive
-# here too, which is why the class was not declared closed when that one was
-# fixed.
+# --- emmeans backend: slope types other than dydx are refused ----------------
+# emtrends() computes dy/dx only, so `slope = "eyex"` must not return dy/dx.
 test_that("a slope the emmeans backend cannot compute is refused, not swapped", {
   skip_if_not_installed("emmeans")
   set.seed(1)

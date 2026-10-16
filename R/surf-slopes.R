@@ -71,13 +71,7 @@ surf_slopes <- function(model,
 
   # Step 2: Compute slopes
   if (method == "emmeans") {
-    # The second locus of the ES-04 defect class. `ems_slopes_emmeans()` takes
-    # no `slope`, and `emmeans::emtrends()` computes dy/dx only, so a request
-    # for "eyex" used to return dy/dx silently while `meta$slope` recorded
-    # "eyex" -- the object's own provenance asserting an elasticity it never
-    # computed. Refuse for the same reason surf_comparison() refuses: this
-    # backend cannot honour the estimand, and translating it here would move
-    # the defect one level down rather than remove it.
+    # emmeans::emtrends() computes dy/dx only, so any other `slope` is refused.
     check_emmeans_slope(slope)
     result <- ems_slopes_emmeans(model, grid, x, y, by, variable, level, ...)
   } else {

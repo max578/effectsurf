@@ -12,7 +12,7 @@
 
 #' Signal an effectsurf refusal
 #'
-#' Raises a classed condition rather than returning a degraded surface. The
+#' Raises a classed condition, and no surface is returned. The
 #' class carries `orchestra_refusal`, which is the predicate the rest of the
 #' fleet routes on, so a caller can tell "this manifest cannot be surfaced"
 #' from "effectsurf broke".
@@ -65,11 +65,12 @@ is_effectsurf_refusal <- function(x) inherits(x, "effectsurf_refusal")
 #' `orchestra_manifest` on a surfaceable inferential target can be rendered
 #' without first being refitted. The manifest's `outputs` supplies the grid.
 #'
-#' The function refuses typed rather than degrading, in four cases: the object
-#' does not present as a manifest; its `inferential_target` is not one a
-#' surface is meaningful for; the producer already abstained
-#' (`summary$abstained`); or the named columns do not form a complete
-#' rectangle, which is the shape every downstream renderer assumes.
+#' The function raises a typed refusal in six cases: the object does not
+#' present as a manifest; its `inferential_target` is not one a surface is
+#' meaningful for; the producer already abstained (`summary$abstained`);
+#' `outputs` is empty; no response column can be identified; or the named
+#' columns are missing or do not form a complete rectangle, which is the shape
+#' every downstream renderer assumes.
 #'
 #' @param manifest An object exposing the orchestra manifest contract --
 #'   `inferential_target`, `outputs`, and optionally `summary` and `metadata`.

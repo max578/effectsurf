@@ -16,7 +16,7 @@ Never returns; raises a condition of class \code{effectsurf_refusal},
 \code{orchestra_refusal}, \code{error}, \code{condition}.
 }
 \description{
-Raises a classed condition rather than returning a degraded surface. The
+Raises a classed condition, and no surface is returned. The
 class carries \code{orchestra_refusal}, which is the predicate the rest of the
 fleet routes on, so a caller can tell "this manifest cannot be surfaced"
 from "effectsurf broke".

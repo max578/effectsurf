@@ -77,18 +77,18 @@
   consumed fitted model objects only and the string "manifest" did not occur
   anywhere in it, so it could not sit on a chain behind any member.
 
-* The manifest is read duck-typed, by property name, so effectsurf takes no
-  dependency on the contract package or on any member. It consumes the
+* The manifest is read duck-typed, by property name, so effectsurf imports
+  neither orchestraManifest nor any other member. It consumes the
   contract and emits nothing back into it, which keeps it a terminal leaf and
   makes a dependency cycle impossible.
 
 * **`effectsurf_refusal()` gives the package its first typed abstention**,
   classed `orchestra_refusal` so the rest of the fleet can route on it.
-  `surf_from_manifest()` refuses rather than degrading in six cases: the
+  `surf_from_manifest()` raises a typed refusal in six cases: the
   object does not present as a manifest, its inferential target has no
   two-predictor response, the producer already abstained, `outputs` is empty,
-  the response column cannot be identified, or the grid is not a complete
-  rectangle. A ragged grid previously became a surface with holes filled by
+  the response column cannot be identified, or the grid columns are missing or
+  do not form a complete rectangle. A ragged grid previously became a surface with holes filled by
   whatever was adjacent.
 
 ## effectsurf 0.2.0.9000

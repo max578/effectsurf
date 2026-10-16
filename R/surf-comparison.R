@@ -22,8 +22,7 @@
 #' @param comparison Character. Type of comparison: `"difference"` (default),
 #'   `"ratio"`, `"lnratio"`. Passed to [marginaleffects::comparisons()].
 #'   `method = "emmeans"` computes differences of estimated marginal means and
-#'   nothing else, so it refuses any other value rather than returning a
-#'   difference under the requested name.
+#'   nothing else, and refuses any other value.
 #'
 #' @return An [effectsurf][new_effectsurf] object of type `"comparison"`.
 #'

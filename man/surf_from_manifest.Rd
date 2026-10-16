@@ -40,11 +40,12 @@ Places effectsurf at the end of an orchestra chain: any member emitting an
 without first being refitted. The manifest's \code{outputs} supplies the grid.
 }
 \details{
-The function refuses typed rather than degrading, in four cases: the object
-does not present as a manifest; its \code{inferential_target} is not one a
-surface is meaningful for; the producer already abstained
-(\code{summary$abstained}); or the named columns do not form a complete
-rectangle, which is the shape every downstream renderer assumes.
+The function raises a typed refusal in six cases: the object does not
+present as a manifest; its \code{inferential_target} is not one a surface is
+meaningful for; the producer already abstained (\code{summary$abstained});
+\code{outputs} is empty; no response column can be identified; or the named
+columns are missing or do not form a complete rectangle, which is the shape
+every downstream renderer assumes.
 }
 \seealso{
 \code{\link[=effectsurf_refusal]{effectsurf_refusal()}}
