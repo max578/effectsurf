@@ -1,0 +1,161 @@
+# Changelog
+
+## effectsurf (development version)
+
+- The package now lives at <https://github.com/max578/effectsurf>, with
+  its site at <https://max578.github.io/effectsurf/>. The README gains a
+  logo, lifecycle, coverage and r-universe badges, and a Related
+  packages section; coverage and lint run on every push.
+
+- [`surf_grid()`](https://max578.github.io/effectsurf/reference/surf_grid.md)
+  builds a surface from a precomputed grid: a cross-validated loss over
+  two tuning axes, computed outside a model. It refuses a ragged grid
+  naming the missing cells, records a `direction` that
+  [`surf_optimum()`](https://max578.github.io/effectsurf/reference/surf_optimum.md)
+  reads when `type` is not given, and carries the new `"score"` type,
+  which print output and captions report as a cross-validated score.
+
+- The profile PDFs written beside an exported surface no longer exchange
+  x and y: `save_profile_pdfs()` read the x profile from the matrix rows
+  (one per y) and the y profile from the columns, which errored on a
+  non-square grid and silently swapped the axes on a square one.
+
+- **The same estimand-discard defect is closed at its second locus.**
+  `surf_slopes(method = "emmeans")` dropped `slope` exactly as
+  [`surf_comparison()`](https://max578.github.io/effectsurf/reference/surf_comparison.md)
+  dropped `comparison`:
+  [`emmeans::emtrends()`](https://rvlenth.github.io/emmeans/reference/emtrends.html)
+  computes the derivative dy/dx only, so a request for `"eyex"`,
+  `"eydx"` or `"dyex"` silently returned dy/dx while `meta$slope`
+  recorded the elasticity the object never computed. It now refuses with
+  a typed `effectsurf_refusal`, naming the backend that does honour the
+  request. Fixing
+  [`surf_comparison()`](https://max578.github.io/effectsurf/reference/surf_comparison.md)
+  alone would have left this alive, which is why the class was not
+  declared closed at the time.
+
+- `S7` is declared in `Suggests`.
+  [`surf_from_manifest()`](https://max578.github.io/effectsurf/reference/surf_from_manifest.md)
+  uses `S7::` behind a
+  [`requireNamespace()`](https://rdrr.io/r/base/ns-load.html) guard, but
+  the dependency was never declared, so `R CMD check --as-cran` reported
+  an undeclared import – a warning introduced by the manifest-ingress
+  commit and not caught there.
+
+### Three correctness fixes
+
+- **[`surf_derivatives()`](https://max578.github.io/effectsurf/reference/surf_derivatives.md)
+  no longer writes fabricated values into `estimate`.** When a
+  derivative surface was effectively constant, the computed values were
+  overwritten with a synthetic linear ramp (0.1% of the value) so
+  plotly’s WebGL renderer would not cull a zero-thickness mesh. The ramp
+  reached
+  [`surf_data()`](https://max578.github.io/effectsurf/reference/surf_data.md),
+  [`surf_tidy()`](https://max578.github.io/effectsurf/reference/surf_tidy.md),
+  [`as.data.frame()`](https://rdrr.io/r/base/as.data.frame.html),
+  [`surf_export()`](https://max578.github.io/effectsurf/reference/surf_export.md)
+  and
+  [`surf_optimum()`](https://max578.github.io/effectsurf/reference/surf_optimum.md)
+  as if it were a derivative, and
+  [`surf_optimum()`](https://max578.github.io/effectsurf/reference/surf_optimum.md)
+  duly reported an optimum at a corner of it. It also widened the range
+  past the threshold of the constancy notice, so the user was never
+  told. The rendering problem is already handled where it belongs –
+  `build_scene()` sets an explicit `zaxis$range` for a flat surface – so
+  the residual noise is now collapsed to the constant it represents and
+  the data stays honest.
+
+- **`surf_comparison(method = "emmeans")` no longer reports an estimand
+  it did not compute.** The emmeans backend was called without the
+  `comparison` argument and always took the pairwise difference of
+  estimated marginal means. A user who asked for `comparison = "ratio"`
+  or `"lnratio"` received differences, and
+  [`es_meta()`](https://max578.github.io/effectsurf/reference/es_meta.md)
+  reported the ratio they had asked for, so nothing in the object or in
+  a plot drawn from it revealed the substitution; a `contrast` given as
+  a level name or a step size was dropped the same way. Since a ratio is
+  not a difference, and emmeans reaches one only by re-expressing the
+  contrast on a transformed scale – which would give a ratio on a log
+  link and another difference on an identity link – the backend now
+  refuses these combinations with a typed
+  [`effectsurf_refusal()`](https://max578.github.io/effectsurf/reference/effectsurf_refusal.md)
+  that names `method = "marginaleffects"` as the route that honours
+  them. Both fields of `meta` now record what was computed:
+  `"difference"`, and `"pairwise"` where that default was applied. The
+  marginaleffects backend is unchanged, and the first tests of the
+  treatment-effect verbs grade every documented `comparison` against an
+  analytic oracle.
+
+- **`surf_prediction(method = "manual")` works without a
+  `predict_fun`.** It is a documented method but was not one of
+  [`ems_predict()`](https://max578.github.io/effectsurf/reference/ems_predict.md)’s
+  choices, so it always errored. Every `method = "manual"` call in the
+  suite happened to pass a `predict_fun`, which routes to `"predict"`
+  and hid the path; it is now mapped to the backend it has always meant,
+  and a test calls it with no `predict_fun`.
+
+### Manifest ingress
+
+- **[`surf_from_manifest()`](https://max578.github.io/effectsurf/reference/surf_from_manifest.md)
+  places effectsurf downstream of the orchestra contract.** Any member
+  emitting an `orchestra_manifest` on a surfaceable inferential target –
+  `predictions`, `treatment_effects`, `breeding_values` – can now be
+  rendered without being refitted first. Previously the package consumed
+  fitted model objects only and the string “manifest” did not occur
+  anywhere in it, so it could not sit on a chain behind any member.
+
+- The manifest is read duck-typed, by property name, so effectsurf
+  imports neither orchestraManifest nor any other member. It consumes
+  the contract and emits nothing back into it, which keeps it a terminal
+  leaf and makes a dependency cycle impossible.
+
+- **[`effectsurf_refusal()`](https://max578.github.io/effectsurf/reference/effectsurf_refusal.md)
+  gives the package its first typed abstention**, classed
+  `orchestra_refusal` so the rest of the fleet can route on it.
+  [`surf_from_manifest()`](https://max578.github.io/effectsurf/reference/surf_from_manifest.md)
+  raises a typed refusal in six cases: the object does not present as a
+  manifest, its inferential target has no two-predictor response, the
+  producer already abstained, `outputs` is empty, the response column
+  cannot be identified, or the grid columns are missing or do not form a
+  complete rectangle. A ragged grid previously became a surface with
+  holes filled by whatever was adjacent.
+
+### effectsurf 0.2.0.9000
+
+- **New feature: Post-prediction surface smoothing** (`smooth`
+  parameter). All `surf_*()` functions now accept a `smooth` argument
+  that applies [`mgcv::gam()`](https://rdrr.io/pkg/mgcv/man/gam.html)
+  tensor product smoothing (`te(x, y)`) to predicted values. This is
+  particularly useful for non-smooth models (random forests, boosted
+  trees, MARS) where raw predictions form jagged or step-function
+  surfaces.
+  - `smooth = NULL` (default): No smoothing – raw predictions displayed.
+  - `smooth = TRUE`: Auto-smooth with `te(x, y, k = -1, bs = "tp")`,
+    using `mgcv`’s automatic basis dimension selection (same default as
+    [`mgcv::s()`](https://rdrr.io/pkg/mgcv/man/s.html)).
+  - `smooth = list(k = 15, bs = "cr", smooth_ci = FALSE)`: Full manual
+    control over basis dimension, basis type, and CI smoothing.
+  - Separate smooth fitted per stratum when `by` is used, preserving
+    interaction structure across groups.
+  - Smoothing metadata stored in the effectsurf object for traceability.
+- Previous version (0.1.0.9000) archived to `zz_archive/`.
+
+### effectsurf 0.1.0.9000
+
+- Initial development version.
+- Core surface functions:
+  [`surf_prediction()`](https://max578.github.io/effectsurf/reference/surf_prediction.md),
+  [`surf_comparison()`](https://max578.github.io/effectsurf/reference/surf_comparison.md),
+  [`surf_slopes()`](https://max578.github.io/effectsurf/reference/surf_slopes.md),
+  [`surf_cate()`](https://max578.github.io/effectsurf/reference/surf_cate.md).
+- Interactive 3D Plotly rendering with categorical stratification.
+- Confidence envelope surfaces.
+- 2D profile projections via
+  [`surf_profile()`](https://max578.github.io/effectsurf/reference/surf_profile.md).
+- Sensitivity analysis via
+  [`surf_sensitivity()`](https://max578.github.io/effectsurf/reference/surf_sensitivity.md).
+- Model-agnostic via `marginaleffects` (100+ model classes).
+- Optional `gratia` integration for GAM smooth surfaces.
+- Bundled `barley_trials` example dataset.
+- HTML export via
+  [`surf_export()`](https://max578.github.io/effectsurf/reference/surf_export.md).
