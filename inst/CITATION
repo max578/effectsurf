@@ -6,6 +6,6 @@ bibentry(
     person("Blakely", "Paynter")
   ),
   year     = "2026",
-  note     = paste("R package version", utils::packageVersion("effectsurf")),
+  note     = paste("R package version", meta$Version),
   url      = "https://github.com/max578/effectsurf"
 )
