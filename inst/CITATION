@@ -7,5 +7,5 @@ bibentry(
   ),
   year     = "2026",
   note     = paste("R package version", utils::packageVersion("effectsurf")),
-  url      = "https://github.com/AAGI-AUS/effectsurf"
+  url      = "https://github.com/max578/effectsurf"
 )

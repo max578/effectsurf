@@ -6,14 +6,16 @@
 \alias{effectsurf-package}
 \title{effectsurf: Interactive 3D Estimated Marginal Surfaces for Conditional Effect Visualisation}
 \description{
+\if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
+
 Extends traditional 2D estimated marginal means (EMMs) into interactive 3D Estimated Marginal Surfaces (EMS). Provides model-agnostic visualisation of predictions, conditional effect sizes, and conditional average treatment effects (CATE) from fitted statistical models. Surfaces are rendered as interactive 'plotly' 3D charts with categorical stratification, confidence envelopes, 2D profile projections, and sensitivity analysis. Supports 100+ model classes via 'marginaleffects', with optional 'gratia' integration for GAM smooth surfaces.
 }
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://aagi-aus.github.io/effectsurf/}
-  \item \url{https://github.com/AAGI-AUS/effectsurf}
-  \item Report bugs at \url{https://github.com/AAGI-AUS/effectsurf/issues}
+  \item \url{https://max578.github.io/effectsurf/}
+  \item \url{https://github.com/max578/effectsurf}
+  \item Report bugs at \url{https://github.com/max578/effectsurf/issues}
 }
 
 }

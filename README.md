@@ -1,12 +1,17 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# effectsurf
+# effectsurf <img src="man/figures/logo.png" align="right" height="139" alt="effectsurf logo" />
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/AAGI-AUS/effectsurf/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/AAGI-AUS/effectsurf/actions/workflows/R-CMD-check.yaml)
-[![codecov](https://codecov.io/gh/AAGI-AUS/effectsurf/graph/badge.svg)](https://codecov.io/gh/AAGI-AUS/effectsurf)
+[![Lifecycle:
+experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![R-CMD-check](https://github.com/max578/effectsurf/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/max578/effectsurf/actions/workflows/R-CMD-check.yaml)
+[![Codecov test
+coverage](https://codecov.io/gh/max578/effectsurf/graph/badge.svg)](https://app.codecov.io/gh/max578/effectsurf)
+[![r-universe](https://max578.r-universe.dev/badges/effectsurf)](https://max578.r-universe.dev/effectsurf)
+[![pkgdown](https://github.com/max578/effectsurf/actions/workflows/pkgdown.yaml/badge.svg)](https://max578.github.io/effectsurf/)
 <!-- badges: end -->
 
 The goal of {effectsurf} is to extend traditional 2D estimated marginal
@@ -33,14 +38,14 @@ Supports 100+ model classes via
 ## Installation
 
 You can install the development version of {effectsurf} from
-[GitHub](https://github.com/AAGI-AUS/effectsurf) with:
+[GitHub](https://github.com/max578/effectsurf) with:
 
 ``` r
 if (!require("pak")) {
   install.packages("pak")
 }
 
-pak::pak("AAGI-AUS/effectsurf")
+pak::pak("max578/effectsurf")
 ```
 
 ## Getting started
@@ -206,24 +211,43 @@ summary(es_barley)
 plot(es_barley, opacity = 0.85)
 ```
 
+## Related packages
+
+- [emmeans](https://CRAN.R-project.org/package=emmeans) computes
+  estimated marginal means, contrasts and trends for linear, generalised
+  linear and mixed models.
+- [marginaleffects](https://CRAN.R-project.org/package=marginaleffects)
+  computes predictions, comparisons and slopes for over 100 classes of
+  models; effectsurf uses it to evaluate each surface.
+- [ggeffects](https://CRAN.R-project.org/package=ggeffects) returns
+  marginal effects and adjusted predictions as tidy data frames for
+  ‘ggplot2’.
+- [visreg](https://CRAN.R-project.org/package=visreg) plots the fit of
+  regression models from a wide range of model classes.
+- [rsm](https://CRAN.R-project.org/package=rsm) designs and fits first-
+  and second-order response-surface models and draws surface plots.
+
+effectsurf shows the estimate over two continuous predictors at once, as
+an interactive 3D surface with confidence envelopes, overlaid by group.
+
 ## Citation
 
 ``` r
 citation("effectsurf")
 To cite package 'effectsurf' in publications use:
 
-  Moldovan M (2026). _effectsurf: Interactive 3D Estimated Marginal
-  Surfaces for Conditional Effect Visualisation_. R package version
-  0.1.0.9000, <https://github.com/maxmoldovan/effectsurf>.
+  Moldovan M, Paynter B (2026). _effectsurf: Interactive 3D Estimated
+  Marginal Surfaces for Conditional Effect Visualisation_. R package
+  version 0.2.0.9000, <https://github.com/max578/effectsurf>.
 
 A BibTeX entry for LaTeX users is
 
   @Manual{,
     title = {effectsurf: Interactive 3D Estimated Marginal Surfaces for Conditional Effect Visualisation},
-    author = {Max Moldovan},
+    author = {Max Moldovan and Blakely Paynter},
     year = {2026},
-    note = {R package version 0.1.0.9000},
-    url = {https://github.com/maxmoldovan/effectsurf},
+    note = {R package version 0.2.0.9000},
+    url = {https://github.com/max578/effectsurf},
   }
 ```
 

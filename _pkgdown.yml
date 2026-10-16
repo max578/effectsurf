@@ -1,4 +1,4 @@
-url: https://aagi-aus.github.io/effectsurf/
+url: https://max578.github.io/effectsurf/
 template:
   bootstrap: 5
 
@@ -40,6 +40,12 @@ reference:
       - new_effectsurf
       - is_effectsurf
       - effectsurf-package
+  - title: "Orchestra Contract"
+    desc: "Build a surface from an orchestra manifest; the typed refusal returned when one cannot be built."
+    contents:
+      - surf_from_manifest
+      - effectsurf_refusal
+      - is_effectsurf_refusal
   - title: "Utilities"
     desc: "Helper and transform functions."
     contents:

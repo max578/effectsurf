@@ -1,5 +1,10 @@
 # effectsurf (development version)
 
+* The package now lives at <https://github.com/max578/effectsurf>, with its
+  site at <https://max578.github.io/effectsurf/>. The README gains a logo,
+  lifecycle, coverage and r-universe badges, and a Related packages section;
+  coverage and lint run on every push.
+
 * `surf_grid()` builds a surface from a precomputed grid: a cross-validated
   loss over two tuning axes, computed outside a model. It refuses a ragged grid
   naming the missing cells, records a `direction` that `surf_optimum()` reads
